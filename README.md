@@ -1,7 +1,7 @@
 angularjs-shared-service
 ========================
 
-$shared service to avoid using $rootScope
+$shared service to avoid using $rootScope directly
 
 
 Basic usage
