@@ -1,32 +1,41 @@
-app.factory "$shared", ($rootScope) ->
-  $rootScope.$shared = {}
-  build = (message) ->
-    "$shared:" + message
+app.factory "$shared", [
+  "$rootScope"
+  "$location"
+  ($rootScope, $location) ->
+    $rootScope.$shared = {}
 
-  emit: (message, object) ->
-    $rootScope.$emit build(message), object
-    return
+    build = (message) ->
+      "$shared:" + message
 
-  on: (scope, message, callbackFxn) ->
-    cleanUpFxn = $rootScope.$on(build(message), callbackFxn)
-    scope.$on "$destroy", ->
-      cleanUpFxn()
+    goTo: (url, apply = false) ->
+      $location.path(url)
+      $rootScope.$apply() if apply
+
+    emit: (message, object) ->
+      $rootScope.$emit build(message), object
       return
 
-    return
+    on: (scope, message, callbackFxn) ->
+      cleanUpFxn = $rootScope.$on(build(message), callbackFxn)
+      scope.$on "$destroy", ->
+        cleanUpFxn()
+        return
 
-  set: (key, value) ->
-    $rootScope.$shared[key] = value
-    $rootScope.$apply()
-    return
-
-  get: (key) ->
-    $rootScope.$shared[key]
-
-  watch: (key, listener) ->
-    $rootScope.$watch "$shared." + key, (newVal, oldVal) ->
-      return  unless newVal
-      listener newVal, oldVal
       return
 
-    return
+    set: (key, value, apply = false) ->
+      $rootScope.$shared[key] = value
+      $rootScope.$apply() if apply
+      return
+
+    get: (key) ->
+      $rootScope.$shared[key]
+
+    watch: (key, listener) ->
+      $rootScope.$watch "$shared." + key, (newVal, oldVal) ->
+        return  unless newVal
+        listener newVal, oldVal
+        return
+
+      return
+]
